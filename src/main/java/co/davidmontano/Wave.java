@@ -31,14 +31,14 @@ public class Wave {
 		this.header = new Header(filename);
 	}
 
-	public AmplitudesIterator amplitudes() throws IOException {
+	public SamplesIterator amplitudes() throws IOException {
 		InputStream data = header.data(new BufferedInputStream(new FileInputStream(filename)));
-		return new AmplitudesIterator(data, header.getBytePerSample(), header.getTotalSamples());
+		return new SamplesIterator(data, 1, header.getBitsPerSample(), header.getTotalSamples());
 	}
 
-	public AmplitudesIterator amplitudes(double seconds) throws IOException {
+	public SamplesIterator amplitudes(double seconds) throws IOException {
 		InputStream data = header.data(new BufferedInputStream(new FileInputStream(filename)));
-		return new AmplitudesIterator(data, header.getBytePerSample(), header.getTotalSamplesForTime(seconds));
+        return new SamplesIterator(data, 1, header.getBitsPerSample(), header.getTotalSamplesForTime(seconds));
 	}
 
 	public double getSecondsLength() {
