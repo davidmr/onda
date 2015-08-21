@@ -21,14 +21,13 @@ import java.io.InputStream;
  *  See the License for the specific language governing permissions an
  *  limitations under the License.
  */
-//TODO test
 public class SubchunkInputStream extends InputStream {
 
 	private final Subchunk subchunk;
 
 	private final InputStream input;
 
-	private long bytesRead;
+	private long bytesRead = 0;
 
 	// IMPORTANT: InputStream must be at the beginning
 	public SubchunkInputStream(Subchunk subchunk, InputStream input) {
@@ -43,7 +42,7 @@ public class SubchunkInputStream extends InputStream {
 
 	@Override
 	public int read() throws IOException {
-		if (bytesRead <= subchunk.getSubchunkSize()) {
+		if (bytesRead < subchunk.getSubchunkSize()) {
 			int read = input.read();
 			if(read >= 0){
 				bytesRead++;
