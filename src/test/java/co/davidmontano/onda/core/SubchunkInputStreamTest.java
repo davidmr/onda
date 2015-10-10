@@ -1,4 +1,4 @@
-package co.davidmontano;
+package co.davidmontano.onda.core;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package co.davidmontano.exception;
+package co.davidmontano.onda.core.exception;
 
 /**
  * Copyright 2015 David Montaño

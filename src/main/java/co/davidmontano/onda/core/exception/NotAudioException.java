@@ -1,4 +1,4 @@
-package co.davidmontano.exception;
+package co.davidmontano.onda.core.exception;
 
 /**
  * Copyright 2015 David Montaño
@@ -15,12 +15,12 @@ package co.davidmontano.exception;
  *  See the License for the specific language governing permissions an
  *  limitations under the License.
  */
-public class BitrateNotSupportedException extends RuntimeException {
+public class NotAudioException extends RuntimeException {
 
-	private static final long serialVersionUID = 1646445592781691949L;
+	private static final long serialVersionUID = -6255492575715730561L;
 
-	public BitrateNotSupportedException(String message) {
+	public NotAudioException(String message) {
 		super(message);
-	}
+	}	
 
 }

@@ -1,4 +1,4 @@
-package co.davidmontano;
+package co.davidmontano.onda.core;
 
 import org.junit.Test;
 
@@ -22,11 +22,11 @@ import static org.hamcrest.Matchers.*;
  *  See the License for the specific language governing permissions an
  *  limitations under the License.
  */
-public class WaveTest {
+public class FileWaveTest {
 
     @Test
     public void shouldLoadCanonicalHeaderFor_1Channel_441khz_16bps() throws IOException {
-        Wave wave = new Wave("src/test/resources/1channel_441khz_16bps.wav");
+        FileWave wave = new FileWave("src/test/resources/1channel_441khz_16bps.wav");
         assertThat(wave.getChannels(), is(1));
         assertThat(wave.getSampleRate(), is(44100));
         assertThat(wave.getBitsPerSample(), is(16));
@@ -34,7 +34,7 @@ public class WaveTest {
 
     @Test
     public void shouldLoadCanonicalHeaderFor_2Channel_441khz_16bps() throws IOException {
-        Wave wave = new Wave("src/test/resources/2channel_441khz_16bps.wav");
+        FileWave wave = new FileWave("src/test/resources/2channel_441khz_16bps.wav");
         assertThat(wave.getChannels(), is(2));
         assertThat(wave.getSampleRate(), is(44100));
         assertThat(wave.getBitsPerSample(), is(16));

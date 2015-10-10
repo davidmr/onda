@@ -1,6 +1,6 @@
-package co.davidmontano;
+package co.davidmontano.onda.core;
 
-import co.davidmontano.exception.CannotReadSubchunkException;
+import co.davidmontano.onda.core.exception.CannotReadSubchunkException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

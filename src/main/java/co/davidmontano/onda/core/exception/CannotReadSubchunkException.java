@@ -1,4 +1,4 @@
-package co.davidmontano.exception;
+package co.davidmontano.onda.core.exception;
 
 /**
  * Copyright 2015 David Montaño
@@ -15,12 +15,12 @@ package co.davidmontano.exception;
  *  See the License for the specific language governing permissions an
  *  limitations under the License.
  */
-public class NotPCMAudioFormatException extends RuntimeException {
+public class CannotReadSubchunkException extends RuntimeException {
 
-	private static final long serialVersionUID = 7051169232200270479L;
+	private static final long serialVersionUID = 6347804693104153221L;
 
-	public NotPCMAudioFormatException(String message) {
-		super(message);
+	public CannotReadSubchunkException(Exception e) {
+		super(e);
 	}
 
 }

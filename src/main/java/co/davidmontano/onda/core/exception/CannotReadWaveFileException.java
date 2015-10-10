@@ -1,4 +1,4 @@
-package co.davidmontano.exception;
+package co.davidmontano.onda.core.exception;
 
 /**
  * Copyright 2015 David Montaño
@@ -15,12 +15,9 @@ package co.davidmontano.exception;
  *  See the License for the specific language governing permissions an
  *  limitations under the License.
  */
-public class NotAudioException extends RuntimeException {
+public class CannotReadWaveFileException extends RuntimeException {
 
-	private static final long serialVersionUID = -6255492575715730561L;
-
-	public NotAudioException(String message) {
-		super(message);
-	}	
-
+    public CannotReadWaveFileException(Exception e) {
+        super(e);
+    }
 }

@@ -1,4 +1,4 @@
-package co.davidmontano;
+package co.davidmontano.onda.core;
 
 
 import org.junit.Test;
@@ -11,13 +11,13 @@ import static org.hamcrest.Matchers.is;
 
 /**
  * Copyright 2015 David Montaño
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, softwar
  * distributed under the License is distributed on an "AS IS" BASIS
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied
@@ -35,8 +35,7 @@ public class SamplesIteratorTest {
                 0, 4, //sample 4
                 5, 0 //sample 5
         };
-        InputStream input = new ByteArrayInputStream(inputArray);
-        SamplesIterator iterator = new SamplesIterator(input, 1, 16, 5);
+        SamplesIterator iterator = new SamplesIterator(new TestWave(inputArray, 1, 2, 5));
 
         Sample sample = null;
 
@@ -66,7 +65,7 @@ public class SamplesIteratorTest {
                 5, 0, 0, 0 //sample 5
         };
         InputStream input = new ByteArrayInputStream(inputArray);
-        SamplesIterator iterator = new SamplesIterator(input, 1, 32, 5);
+        SamplesIterator iterator = new SamplesIterator(new TestWave(inputArray, 1, 4, 5));
 
         Sample sample = null;
 
@@ -96,7 +95,7 @@ public class SamplesIteratorTest {
                 9, 10, 11, 12 // sample 5
         };
         InputStream input = new ByteArrayInputStream(inputArray);
-        SamplesIterator iterator = new SamplesIterator(input, 2, 16, 5);
+        SamplesIterator iterator = new SamplesIterator(new TestWave(inputArray, 2, 2, 5));
 
         Sample sample = null;
 

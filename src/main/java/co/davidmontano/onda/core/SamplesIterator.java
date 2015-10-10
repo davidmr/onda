@@ -1,4 +1,4 @@
-package co.davidmontano;
+package co.davidmontano.onda.core;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,11 +30,11 @@ public class SamplesIterator implements Iterator<Sample> {
     private final long numSamples;
     private int position;
 
-    protected SamplesIterator(InputStream input, int channels, int bitsPerSample, long numSamples) {
-        this.input = input;
-        this.channels = channels;
-        this.bytePerSample = bitsPerSample / 8;
-        this.numSamples = numSamples;
+    public SamplesIterator(Wave wave) {
+        this.input = wave.data();
+        this.channels = wave.getChannels();
+        this.bytePerSample = wave.getBytePerSample();
+        this.numSamples = wave.getTotalSamples();
     }
 
     @Override
