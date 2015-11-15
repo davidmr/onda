@@ -11,13 +11,13 @@ import java.util.Set;
 
 /**
  * Copyright 2015 David Montaño
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, softwar
  * distributed under the License is distributed on an "AS IS" BASIS
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied
@@ -29,7 +29,7 @@ public class ChunkReader implements Constants {
     private final Set<Subchunk> subchunks;
 
     public ChunkReader() {
-        subchunks = new HashSet<Subchunk>();
+        subchunks = new HashSet<>();
     }
 
     public Set<Subchunk> read(InputStream inputStream, long totalSize) throws IOException {
@@ -46,6 +46,7 @@ public class ChunkReader implements Constants {
                 chunkBuffer[chunkPointer++]
         });
         // little endian
+        @SuppressWarnings("unused")
         long chunkSize =
                 (long) (chunkBuffer[chunkPointer++] & 0xff) |
                         (long) (chunkBuffer[chunkPointer++] & 0xff) << 8 |
@@ -65,7 +66,6 @@ public class ChunkReader implements Constants {
 
         return Collections.unmodifiableSet(subchunks);
     }
-
 
 
     private void parseSubchunk(InputStream inputStream, long bytesRead, long totalSize) throws IOException {

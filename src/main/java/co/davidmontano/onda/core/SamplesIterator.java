@@ -25,9 +25,9 @@ public class SamplesIterator implements Iterator<Sample> {
 
     private final InputStream input;
     private final int bytePerSample;
-    private int channels;
-    private int bitsPerSample;
+    private final int channels;
     private final long numSamples;
+    private final int maxPossibleAmplitude;
     private int position;
 
     public SamplesIterator(Wave wave) {
@@ -35,6 +35,7 @@ public class SamplesIterator implements Iterator<Sample> {
         this.channels = wave.getChannels();
         this.bytePerSample = wave.getBytePerSample();
         this.numSamples = wave.getTotalSamples();
+        this.maxPossibleAmplitude = 0xFFFFFFFF >> (32 - 8 * this.bytePerSample); //TODO check is working
     }
 
     @Override
@@ -51,7 +52,6 @@ public class SamplesIterator implements Iterator<Sample> {
         } else {
             throw new IllegalArgumentException("End of stream reached. Position: " + position + " Samples: " + numSamples);
         }
-
     }
 
     private void sampleRead() {
@@ -59,9 +59,10 @@ public class SamplesIterator implements Iterator<Sample> {
     }
 
     private Sample getNextSample() {
-        int[] amplitudes = new int[channels];
+        double[] amplitudes = new double[channels];
         for (int i = 0; i < channels; i++) {
-            amplitudes[i] = getNextAmplitude();
+            double amplitude = getNextAmplitude();
+            amplitudes[i] = amplitude / maxPossibleAmplitude;
         }
         return new Sample(amplitudes);
     }
@@ -90,10 +91,14 @@ public class SamplesIterator implements Iterator<Sample> {
         throw new UnsupportedOperationException();
     }
 
-    public Sample moveToSample(int sample) throws IOException {
-        int diff = (sample - position);
-        IOUtils.skipFully(input, diff * bytePerSample * channels);
-        position = sample;
-        return next();
+    public Sample moveToSample(int sample) {
+        try {
+            int diff = (sample - position);
+            IOUtils.skipFully(input, diff * bytePerSample * channels);
+            position = sample;
+            return next();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

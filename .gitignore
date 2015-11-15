@@ -1,5 +1,8 @@
 .gradle
 .idea
 build
-gradle
 onda.iml
+.classpath
+.project
+.settings/
+bin/

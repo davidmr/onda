@@ -1,6 +1,9 @@
 package co.davidmontano.onda.core;
 
-import co.davidmontano.onda.core.exception.*;
+import co.davidmontano.onda.core.exception.BitrateNotSupportedException;
+import co.davidmontano.onda.core.exception.CannotReadWaveFileException;
+import co.davidmontano.onda.core.exception.NotPCMAudioFormatException;
+import co.davidmontano.onda.core.exception.SubchunkNotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -11,13 +14,13 @@ import java.util.Set;
 
 /**
  * Copyright 2015 David Montaño
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, softwar
  * distributed under the License is distributed on an "AS IS" BASIS
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied
@@ -29,18 +32,18 @@ public class FileWave implements Wave, Constants {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final String location;
-    private int audioFormat; // unsigned 2 bytes, little endian
-    private int channels; // unsigned 2 bytes, little endian
-    private long sampleRate; // unsigned 4 bytes, little endian
-    private long byteRate; // unsigned 4 bytes, little endian
-    private int blockAlign; // unsigned 2 bytes, little endian
-    private int bitsPerSample; // unsigned 2 bytes, little endian
     private final int bytePerSample;
     private final long totalSamples;
     private final double length; // length in seconds
     private final long dataChunkSize;
     private final long totalSize;
     private final Set<Subchunk> subchunks;
+    private int audioFormat; // unsigned 2 bytes, little endian
+    private int channels; // unsigned 2 bytes, little endian
+    private long sampleRate; // unsigned 4 bytes, little endian
+    private long byteRate; // unsigned 4 bytes, little endian
+    private int blockAlign; // unsigned 2 bytes, little endian
+    private int bitsPerSample; // unsigned 2 bytes, little endian
 
     public FileWave(String location) throws IOException {
         this.location = location;
@@ -97,13 +100,12 @@ public class FileWave implements Wave, Constants {
     }
 
 
-
     private void checkAcceptableWavProperties() {
         if (audioFormat != AUDIO_FORMAT_PCM) {
             throw new NotPCMAudioFormatException("Invalid audio format {" + audioFormat + "}");
         }
-        if (bitsPerSample != 8 && bitsPerSample != 16) {
-            throw new BitrateNotSupportedException("Bitrate not supported: " + bitsPerSample + ". Use either 8 o 16");
+        if (bitsPerSample != 8 && bitsPerSample != 16 && bitsPerSample != 32) {
+            throw new BitrateNotSupportedException("Bitrate not supported: " + bitsPerSample + ". Use either 8, 16, 32");
         }
     }
 

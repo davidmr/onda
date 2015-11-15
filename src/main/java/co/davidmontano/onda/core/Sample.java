@@ -18,13 +18,13 @@ package co.davidmontano.onda.core;
  */
 public class Sample {
 
-    private final int[] amplitudes;
+    private final double[] amplitudes;
 
-    public Sample(int[] amplitudes) {
+    public Sample(double[] amplitudes) {
         this.amplitudes = amplitudes;
     }
 
-    public int getAmplitude(int channel) {
+    public double getAmplitude(int channel) {
         if (channel >= amplitudes.length) {
             throw new IllegalArgumentException("Channel " + channel + " not found");
         }

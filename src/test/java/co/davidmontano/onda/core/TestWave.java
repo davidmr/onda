@@ -40,4 +40,5 @@ public class TestWave implements Wave {
     public long getTotalSamples() {
         return totalSamples;
     }
+
 }
