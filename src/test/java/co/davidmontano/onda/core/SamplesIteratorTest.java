@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -26,43 +27,50 @@ import static org.hamcrest.Matchers.is;
  */
 public class SamplesIteratorTest {
 
+    private static final double DELTA = 0.000000001;
+
+    private static final double MAX_AMPLITUDE_16BITS = 65535;
+
+    private static final double MAX_AMPLITUDE_32BITS = 4294967295L;
+
     @Test
     public void shouldIterateSamples_1Channel_16bits() {
+
         byte[] inputArray = {
-                1, 0, //sample 1
-                2, 0, //sample 2
-                0, 3, //sample 3
-                0, 4, //sample 4
-                5, 0 //sample 5
+                0, (byte) 255, //sample 1: 65280
+                (byte) 255, 0, //sample 2: 255
+                (byte) 255, (byte) 255, //sample 3: 65535
+                0, 0, //sample 4: 0
+                10, 10 //sample 5: 2570
         };
         SamplesIterator iterator = new SamplesIterator(new TestWave(inputArray, 1, 2, 5));
 
         Sample sample = null;
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(1));
+        assertThat(sample.getAmplitude(0), closeTo(65280 / MAX_AMPLITUDE_16BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(2));
+        assertThat(sample.getAmplitude(0), closeTo(255 / MAX_AMPLITUDE_16BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(768));
+        assertThat(sample.getAmplitude(0), closeTo(1, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(1024));
+        assertThat(sample.getAmplitude(0), closeTo(0, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(5));
+        assertThat(sample.getAmplitude(0), closeTo(2570 / MAX_AMPLITUDE_16BITS, DELTA));
     }
 
     @Test
     public void shouldIterateSamples_1Channel_32bits() {
         byte[] inputArray = {
-                1, 0, 0, 0, //sample 1
-                2, 0, 0, 0, //sample 2
-                0, 3, 0, 1, //sample 3
-                0, 4, 0, 1, //sample 4
-                5, 0, 0, 0 //sample 5
+                (byte) 255, 0, 0, 0, //sample 1: 255
+                100, (byte) 255, 0, 0, //sample 2: 65380
+                0, 3, 0, 1, //sample 3: 0, 3, 0, 1 becomes 3 << 8 & 1 << 24 = 1 0000 0000 0000 0011 0000 0000 = 16777984
+                (byte) 255, (byte) 255, (byte) 255, (byte) 255, //sample 4: 4294967295L
+                0, 0, 0, 0 //sample 5: 0
         };
         InputStream input = new ByteArrayInputStream(inputArray);
         SamplesIterator iterator = new SamplesIterator(new TestWave(inputArray, 1, 4, 5));
@@ -70,29 +78,28 @@ public class SamplesIteratorTest {
         Sample sample = null;
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(1));
+        assertThat(sample.getAmplitude(0), closeTo(255 / MAX_AMPLITUDE_32BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(2));
+        assertThat(sample.getAmplitude(0), closeTo(65380 / MAX_AMPLITUDE_32BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(16777984)); // 0, 3, 0, 1 becomes 3 << 8 & 1 << 24 = 1 0000 0000 0000 0011 0000 0000 = 16777984
+        assertThat(sample.getAmplitude(0), closeTo(16777984 / MAX_AMPLITUDE_32BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(16778240));
+        assertThat(sample.getAmplitude(0), closeTo(1, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(5));
+        assertThat(sample.getAmplitude(0), closeTo(0, DELTA));
     }
 
     @Test
     public void shouldIterateSamples_2Channel_16bits() {
         byte[] inputArray = {
-                1, 0, 2, 0, //sample 1
-                0, 3, 0, 4, //sample 2
-                5, 0, 6, 0, //sample 3
-                0, 7, 0, 8, //sample 4
-                9, 10, 11, 12 // sample 5
+                0, (byte) 255, (byte) 255, 0, //sample 1: {65280, 255}
+                0, 10, 0, 20, //sample 2: {2560, 5120}
+                5, 0, 6, 0, //sample 3: {5, 6}
+                0, 7, 0, 8 //sample 4: {1792, 2048}
         };
         InputStream input = new ByteArrayInputStream(inputArray);
         SamplesIterator iterator = new SamplesIterator(new TestWave(inputArray, 2, 2, 5));
@@ -100,24 +107,21 @@ public class SamplesIteratorTest {
         Sample sample = null;
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(1));
-        assertThat(sample.getAmplitude(1), is(2));
+        assertThat(sample.getAmplitude(0), closeTo(65280 / MAX_AMPLITUDE_16BITS, DELTA));
+        assertThat(sample.getAmplitude(1), closeTo(255 / MAX_AMPLITUDE_16BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(768)); // 0, 3 becomes 3 << 8 = 11 0000 0000 = 768
-        assertThat(sample.getAmplitude(1), is(1024));
+        assertThat(sample.getAmplitude(0), closeTo(2560 / MAX_AMPLITUDE_16BITS, DELTA));
+        assertThat(sample.getAmplitude(1), closeTo(5120 / MAX_AMPLITUDE_16BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(5));
-        assertThat(sample.getAmplitude(1), is(6));
+        assertThat(sample.getAmplitude(0), closeTo(5 / MAX_AMPLITUDE_16BITS, DELTA));
+        assertThat(sample.getAmplitude(1), closeTo(6 / MAX_AMPLITUDE_16BITS, DELTA));
 
         sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(1792));
-        assertThat(sample.getAmplitude(1), is(2048));
+        assertThat(sample.getAmplitude(0), closeTo(1792 / MAX_AMPLITUDE_16BITS, DELTA));
+        assertThat(sample.getAmplitude(1), closeTo(2048 / MAX_AMPLITUDE_16BITS, DELTA));
 
-        sample = iterator.next();
-        assertThat(sample.getAmplitude(0), is(2569));
-        assertThat(sample.getAmplitude(1), is(3083));
     }
 
 }

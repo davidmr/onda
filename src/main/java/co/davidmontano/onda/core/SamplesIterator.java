@@ -27,7 +27,7 @@ public class SamplesIterator implements Iterator<Sample> {
     private final int bytePerSample;
     private final int channels;
     private final long numSamples;
-    private final int maxPossibleAmplitude;
+    private final double maxPossibleAmplitude;
     private int position;
 
     public SamplesIterator(Wave wave) {
@@ -35,7 +35,7 @@ public class SamplesIterator implements Iterator<Sample> {
         this.channels = wave.getChannels();
         this.bytePerSample = wave.getBytePerSample();
         this.numSamples = wave.getTotalSamples();
-        this.maxPossibleAmplitude = 0xFFFFFFFF >> (32 - 8 * this.bytePerSample); //TODO check is working
+        this.maxPossibleAmplitude = Math.pow(2, 8 * this.bytePerSample) - 1;
     }
 
     @Override
@@ -68,12 +68,12 @@ public class SamplesIterator implements Iterator<Sample> {
     }
 
 
-    private int getNextAmplitude() {
-        int amplitude = 0;
+    private long getNextAmplitude() {
+        long amplitude = 0;
         for (int byteNumber = 0; byteNumber < bytePerSample; byteNumber++) {
             // little endian
             byte data = getNextByte(input);
-            amplitude |= (int) ((data & 0xFF) << (byteNumber * 8));
+            amplitude |= (long)(data & 0xFF) << (byteNumber * 8);
         }
         return amplitude;
     }
