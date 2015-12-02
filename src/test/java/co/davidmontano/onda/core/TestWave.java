@@ -41,4 +41,8 @@ public class TestWave implements Wave {
         return totalSamples;
     }
 
+    @Override
+    public Wave trim(double seconds) {
+        return this;
+    }
 }

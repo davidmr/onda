@@ -1,10 +1,12 @@
 package co.davidmontano.onda.core;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -38,5 +40,16 @@ public class FileWaveTest {
         assertThat(wave.getChannels(), is(2));
         assertThat(wave.getSampleRate(), is(44100));
         assertThat(wave.getBitsPerSample(), is(16));
+    }
+
+    @Test
+    public void shouldTrimWhenDurationLongerThanRequested() throws IOException {
+        FileWave trimmed = new FileWave("src/test/resources/1channel_441khz_16bps.wav").trim(0.1);
+        int bytesRead = IOUtils.read(trimmed.data(), new byte[4410]);
+        assertThat(trimmed.getChannels(), is(1));
+        assertThat(trimmed.getSampleRate(), is(44100));
+        assertThat(trimmed.getBitsPerSample(), is(16));
+        assertThat(trimmed.getLength(), closeTo(0.1, 0.001));
+        assertThat(bytesRead, is(4410));
     }
 }

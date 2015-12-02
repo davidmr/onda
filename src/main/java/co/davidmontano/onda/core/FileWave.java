@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -34,12 +35,10 @@ public class FileWave implements Wave, Constants {
     private final String location;
     private final int bytePerSample;
     private final long totalSamples;
-    private final double length; // length in seconds
-    private final long dataChunkSize;
-    private final long totalSize;
+
     private final Set<Subchunk> subchunks;
     private int audioFormat; // unsigned 2 bytes, little endian
-    private int channels; // unsigned 2 bytes, little endian
+    private int channels; // unsigned 2 bytes, lqittle endian
     private long sampleRate; // unsigned 4 bytes, little endian
     private long byteRate; // unsigned 4 bytes, little endian
     private int blockAlign; // unsigned 2 bytes, little endian
@@ -49,25 +48,29 @@ public class FileWave implements Wave, Constants {
         this.location = location;
 
         File file = new File(location);
-        totalSize = FileUtils.sizeOf(file);
+        long totalSize = FileUtils.sizeOf(file);
 
         subchunks = new ChunkReader().read(waveInputStream(), totalSize);
-//        subchunks = new HashSet<Subchunk>();
-//        readSubchunks(waveInputStream());
 
         Subchunk fmt = findSubchunk(FMT_HEADER_ID);
         byte[] fmtData = IOUtils.toByteArray(fmt.subchunkData(waveInputStream()));
         readFmtHeader(fmtData);
 
         Subchunk data = findSubchunk(DATA_HEADER_ID);
-        dataChunkSize = data.getSubchunkSize();
+        long dataChunkSize = data.getSubchunkSize();
 
-        length = byteRate > 0 ? (dataChunkSize / byteRate) : 0;
         bytePerSample = bitsPerSample / 8;
         totalSamples = dataChunkSize / bytePerSample;
 
         checkAcceptableWavProperties();
         logger.debug("FileWave parsed: {}", this);
+    }
+
+    private FileWave(String location, int bytePerSample, long totalSamples, Set<Subchunk> subchunks){
+        this.location = location;
+        this.bytePerSample = bytePerSample;
+        this.totalSamples = totalSamples;
+        this.subchunks = subchunks;
     }
 
     private InputStream waveInputStream() {
@@ -156,7 +159,28 @@ public class FileWave implements Wave, Constants {
     }
 
     public double getLength() {
-        return length;
+        return (double) totalSamples / (double) sampleRate;
+    }
+
+    @Override
+    public FileWave trim(double seconds){
+        long trimmedTotalSamples = getTotalSamplesForTime(seconds);
+        long trimmedSubchunkSize = trimmedTotalSamples * bytePerSample * channels;
+
+        Subchunk untrimmedData = findSubchunk(DATA_HEADER_ID);
+        Set<Subchunk> trimmedSubchuks = new HashSet<>(subchunks);
+        trimmedSubchuks.remove(untrimmedData);
+        trimmedSubchuks.add(new Subchunk(DATA_HEADER_ID, untrimmedData.getOffset(), trimmedSubchunkSize));
+
+        FileWave trimmedWave = new FileWave(location, bytePerSample, trimmedTotalSamples, trimmedSubchuks);
+        trimmedWave.audioFormat = this.audioFormat;
+        trimmedWave.channels = this.channels;
+        trimmedWave.sampleRate = this.sampleRate;
+        trimmedWave.byteRate = this.byteRate;
+        trimmedWave.blockAlign = this.blockAlign;
+        trimmedWave.bitsPerSample = this.bitsPerSample;
+
+        return trimmedWave;
     }
 
     @Override
@@ -170,9 +194,6 @@ public class FileWave implements Wave, Constants {
                 ", bitsPerSample=" + bitsPerSample +
                 ", bytePerSample=" + bytePerSample +
                 ", totalSamples=" + totalSamples +
-                ", length=" + length +
-                ", dataChunkSize=" + dataChunkSize +
-                ", totalSize=" + totalSize +
                 ", subchunks=" + subchunks +
                 '}';
     }
